@@ -22,7 +22,8 @@ dbcc.VC.db
 *.opendb
 
 Release/
-
+build/
+!build/msvc.bat
 
 # QtCreator project files
 *.pro.user
