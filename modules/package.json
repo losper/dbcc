@@ -1,0 +1,35 @@
+{
+	"name": "remote",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"types": "src/index.d.ts",
+	"scripts": {
+		"build": "rimraf stage && cross-env opt=build webpack",
+		"dev": "rimraf dist && node copy && cross-env opt=dev webpack",
+		"test": "node test/test.js",
+		"pretest": "npm run build",
+		"pm-android": "node node_modules/@passoa/pm -t android",
+		"pm-msvc": "node node_modules/@passoa/pm -t msvc"
+	},
+	"author": "",
+	"license": "ISC",
+	"dependencies": {},
+	"devDependencies": {
+		"@babel/core": "^7.5.5",
+		"@babel/preset-env": "^7.5.5",
+		"@passoa/tap": "^1.0.4",
+		"@types/mkdirp": "^0.5.2",
+		"@types/node": "^12.6.8",
+		"@types/tape": "^4.2.33",
+		"babel-loader": "^8.0.6",
+		"cross-env": "^5.2.0",
+		"fs-extra": "^8.1.0",
+		"rimraf": "^2.6.3",
+		"ts-loader": "^6.0.4",
+		"typescript": "^3.5.3",
+		"webpack": "^4.36.1",
+		"webpack-bundle-analyzer": "^3.3.2",
+		"webpack-cli": "^3.3.6"
+	}
+}

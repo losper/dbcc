@@ -1,9 +1,9 @@
 #include "mpc.h"
-
+#include "src/binding.h"
 /*
 ** State Type
 */
-
+extern struct pa_plugin gp;
 static mpc_state_t mpc_state_invalid(void) {
   mpc_state_t s;
   s.pos = -1;
@@ -474,7 +474,7 @@ static int mpc_input_success(mpc_input_t *i, char c, char **o) {
     (*o)[0] = c;
     (*o)[1] = '\0';
   }
-
+  notify(i->filename, i->state.pos);
   return 1;
 }
 
@@ -1041,7 +1041,7 @@ static int mpc_parse_run(mpc_input_t *i, mpc_parser_t *p, mpc_result_t *r, mpc_e
   mpc_result_t results_stk[MPC_PARSE_STACK_MIN];
   mpc_result_t *results;
   int results_slots = MPC_PARSE_STACK_MIN;
-
+  
   switch (p->type) {
 
     /* Basic Parsers */

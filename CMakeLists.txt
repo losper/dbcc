@@ -16,16 +16,19 @@ SET(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES "stdc++;")
 SET(CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES "...")
 endif()
 
-ADD_EXECUTABLE(dbcc
-				${PROJECT_SOURCE_DIR}/main.cpp
+set(CMAKE_SHARED_LIBRARY_SUFFIX ".passoa")
+SET(CMAKE_SHARED_LIBRARY_PREFIX "")
+
+add_library(dbcc SHARED
+				${PROJECT_SOURCE_DIR}/src/index.cpp
+				${PROJECT_SOURCE_DIR}/src/binding.cpp
+				${PROJECT_SOURCE_DIR}/src/export.def
 				${PROJECT_SOURCE_DIR}/mpc.c
 				${PROJECT_SOURCE_DIR}/2json.c
+				${PROJECT_SOURCE_DIR}/2c.c
 				${PROJECT_SOURCE_DIR}/can.c
 				${PROJECT_SOURCE_DIR}/util.c
 				${PROJECT_SOURCE_DIR}/parse.c
 				)
-install(TARGETS dbcc
-	RUNTIME DESTINATION ./ 
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib
-)
+install(TARGETS dbcc RUNTIME DESTINATION node_modules/dbcc)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/modules/stage/ DESTINATION node_modules/dbcc)
