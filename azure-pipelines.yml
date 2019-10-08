@@ -19,7 +19,7 @@ steps:
 
 - script: |
    cd build
-   cmake ../generate -G "Visual Studio 15 2017" -DCMAKE_TOOLCHAIN_FILE=../cmake/msvc.cmake -DCMAKE_INSTALL_PREFIX=../output/msvc -DOpenCV_DIR=d:/a/1/s/dist
+   cmake ../ -G "Visual Studio 15 2017" -DCMAKE_INSTALL_PREFIX=../output/msvc
    cmake --build ./ --target install --config Release
    
   displayName: 'build c++ addon'
@@ -43,7 +43,7 @@ steps:
     addChangeLog: false
   condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
 
-  - task: CopyFilesOverSSH@0
+- task: CopyFilesOverSSH@0
   inputs:
     sshEndpoint: 'ssh'
     sourceFolder: '$(Build.ArtifactStagingDirectory)'
