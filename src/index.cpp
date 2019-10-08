@@ -7,6 +7,7 @@ extern "C" int passoa_init(pa_plugin p) {
     const pa_function_list_entry my_module_funcs[] = {
         { "dbc2Json", dbc2Json, PA_VARARGS /*nargs*/ },
         { "dbc2C", dbc2C, PA_VARARGS /*nargs*/ },
+        { "dbcBind", dbcBind, PA_VARARGS /*nargs*/ },
         { 0, 0, 0 }
     };
     gp = p;

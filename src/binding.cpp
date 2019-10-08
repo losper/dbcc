@@ -1,4 +1,5 @@
 #include "binding.h"
+#include "notify.h"
 #include "../2json.h"
 #include "../2c.h"
 #include "../util.h"
@@ -8,20 +9,27 @@
 
 extern struct pa_plugin gp;
 int gref = -1;
-void onCall(char* fn,int step) {
-    if (gp.ctx) {
+void onCall(char* fn, size_t pos, size_t length) {
+    if ((gref!=-1) && gp.ctx) {
         gp.eval_string(gp.ctx, "(passoa_callbacks.call.bind(passoa_callbacks))");
         gp.push_int(gp.ctx, gref);
         gp.push_string(gp.ctx, fn);
-        gp.push_int(gp.ctx, step);
+        gp.push_int(gp.ctx, pos);
+        gp.push_int(gp.ctx, length);
         //gp.push_int(gp.ctx, total);
-        gp.call(gp.ctx, 3);
+        gp.call(gp.ctx, 4);
         gp.pop(gp.ctx);
     }
 }
-void notify(char* fn, int step) {
-    if (!step % 10) {
-        onCall(fn, step);
+int dbcBind(pa_context *ctx) {
+    if (gp.is_number(ctx, 0)) {
+        gref = gp.get_int(ctx,0);
+    }
+    return 0;
+}
+void dbcnotify(char* fn, size_t pos,size_t length) {
+    if (!(pos % 10)) {
+        onCall(fn, pos,length);
     }
 }
 int dbc2jsonWrapper(dbc_t *dbc, const char *dbc_file, bool use_time_stamps)
@@ -52,23 +60,30 @@ int dbc2cWrapper(dbc_t *dbc, std::string dir,std::string fname, dbc2c_options_t 
     fclose(h);
     return r;
 }
+void dbc2json_thread(std::string src, std::string dst, bool use_time_stamps) {
+    void* p = gp.keep_io();
+    mpc_ast_t* ast = parse_dbc_file_by_name(src.c_str());
+    dbc_t *dbc = ast2dbc(ast);
+    dbc2jsonWrapper(dbc, dst.c_str(), use_time_stamps);
+    dbc_delete(dbc);
+    mpc_ast_delete(ast);
+    gref = -1;
+    gp.release_io(p);
+}
 int dbc2Json(pa_context *ctx) {
     if (gref == -1)return 0;
-    if (gp.is_string(ctx, 0) && gp.is_string(ctx, 1) && gp.is_number(ctx,2)) {
-        mpc_ast_t* ast = parse_dbc_file_by_name(gp.get_string(ctx, 0));
-        dbc_t *dbc = ast2dbc(ast);
-        dbc2jsonWrapper(dbc, gp.get_string(ctx, 1), false);
-        dbc_delete(dbc);
-        mpc_ast_delete(ast);
+    if (gp.is_string(ctx, 0) && gp.is_string(ctx, 1) && gp.is_boolean(ctx,2)) {
+        std::thread t1(dbc2json_thread, gp.get_string(ctx, 0), gp.get_string(ctx, 1),
+            gp.get_boolean(ctx, 2));
+        t1.detach();
     }
     return 0;
 }
-void dbc2c_thread(std::string src,std::string dst,std::string fname,int ref) {
+void dbc2c_thread(std::string src,std::string dst,std::string fname) {
     dbc2c_options_t copts = {
         false,true,false,true,true,false
     };
     void* p=gp.keep_io();
-    gref = ref;
     mpc_ast_t* ast = parse_dbc_file_by_name(src.c_str());
     dbc_t *dbc = ast2dbc(ast);
     dbc2cWrapper(dbc, dst.c_str(), fname.c_str(), &copts);
@@ -78,11 +93,10 @@ void dbc2c_thread(std::string src,std::string dst,std::string fname,int ref) {
     gp.release_io(p);
 }
 int dbc2C(pa_context *ctx) {
-    if (gref == -1)return 0;
     if (gp.is_string(ctx, 0) && gp.is_string(ctx, 1) 
-        && gp.is_string(ctx, 2) && gp.is_number(ctx, 3)) {
+        && gp.is_string(ctx, 2)) {
         std::thread t1(dbc2c_thread,gp.get_string(ctx,0), gp.get_string(ctx, 1),
-            gp.get_string(ctx, 2), gp.is_number(ctx, 3));
+            gp.get_string(ctx, 2));
         t1.detach();
     }
     return 0;

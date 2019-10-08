@@ -1,5 +1,5 @@
 #include "mpc.h"
-#include "src/binding.h"
+#include "src/notify.h"
 /*
 ** State Type
 */
@@ -76,7 +76,7 @@ typedef struct {
 } mpc_mem_t;
 
 typedef struct {
-
+    
   int type;
   char *filename;
   mpc_state_t state;
@@ -93,7 +93,7 @@ typedef struct {
 
   char *lasts;
   char last;
-
+  size_t length;
   size_t mem_index;
   char mem_full[MPC_INPUT_MEM_NUM];
   mpc_mem_t mem[MPC_INPUT_MEM_NUM];
@@ -125,7 +125,7 @@ static mpc_input_t *mpc_input_new_string(const char *filename, const char *strin
 
   i->mem_index = 0;
   memset(i->mem_full, 0, sizeof(char) * MPC_INPUT_MEM_NUM);
-
+  i->length = strlen(string)+1;
   return i;
 }
 
@@ -155,7 +155,7 @@ static mpc_input_t *mpc_input_new_nstring(const char *filename, const char *stri
 
   i->mem_index = 0;
   memset(i->mem_full, 0, sizeof(char) * MPC_INPUT_MEM_NUM);
-
+  i->length = strlen(string) + 1;
   return i;
 
 }
@@ -474,7 +474,7 @@ static int mpc_input_success(mpc_input_t *i, char c, char **o) {
     (*o)[0] = c;
     (*o)[1] = '\0';
   }
-  notify(i->filename, i->state.pos);
+  dbcnotify(i->filename, i->state.pos,i->length);
   return 1;
 }
 

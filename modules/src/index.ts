@@ -1,20 +1,9 @@
-import { dbc2C, dbc2Json } from './binding';
+import { dbc2C, dbc2Json, bind } from './binding';
 import { normalize, basename, extname } from 'path';
 import { statSync } from 'fs';
-export function dbc_convert(
-	cast: string,
-	src: string,
-	dst: string,
-	cb: (target: string, step: number, total: number) => void
-): void;
-export function dbc_convert(
-	cast: string,
-	src: string,
-	dst: string,
-	fname: string,
-	cb: (target: string, step: number, total: number) => void
-): void;
-export function dbc_convert(cast: string, src: string, dst: string, fname: any, cb?: any) {
+export function dbc_convert(cast: string, src: string, dst: string): void;
+export function dbc_convert(cast: string, src: string, dst: string, fname: string): void;
+export function dbc_convert(cast: string, src: string, dst: string, fname?: any) {
 	if (!statSync(dst).isDirectory()) {
 		return;
 	}
@@ -22,18 +11,20 @@ export function dbc_convert(cast: string, src: string, dst: string, fname: any, 
 	switch (typeof fname) {
 		case 'string':
 			break;
-		case 'function':
-			cb = fname;
 		default:
 			fname = basename(src, extname(src));
 			break;
 	}
 	switch (cast) {
 		case 'c':
-			dbc2C(src, dst, fname, cb);
+			dbc2C(src, dst, fname);
 			break;
 		case 'json':
-			dbc2C(src, dst, fname, cb);
+			console.log(dst + fname + '.json');
+			dbc2Json(src, dst + fname + '.json', false);
 			break;
 	}
+}
+export function dbc_bind(cb: (target: string, step: number, total: number) => void) {
+	return bind(cb);
 }
