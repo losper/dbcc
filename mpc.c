@@ -125,7 +125,7 @@ static mpc_input_t *mpc_input_new_string(const char *filename, const char *strin
 
   i->mem_index = 0;
   memset(i->mem_full, 0, sizeof(char) * MPC_INPUT_MEM_NUM);
-  i->length = strlen(string)+1;
+  i->length = strlen(string);
   return i;
 }
 
@@ -155,7 +155,7 @@ static mpc_input_t *mpc_input_new_nstring(const char *filename, const char *stri
 
   i->mem_index = 0;
   memset(i->mem_full, 0, sizeof(char) * MPC_INPUT_MEM_NUM);
-  i->length = strlen(string) + 1;
+  i->length = strlen(string);
   return i;
 
 }
