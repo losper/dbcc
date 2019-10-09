@@ -5,6 +5,10 @@
 
 pool:
   name: Hosted VS2017
+  
+variables:
+  RepoName: dbcc
+  
 steps:
 - task: Npm@1
   inputs:
@@ -30,7 +34,7 @@ steps:
     rootFolderOrFile: output/msvc
     includeRootFolder: false
     archiveType: tar
-    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name)-msvc-$(Build.SourceBranchName).tar.gz'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(RepoName)-msvc-$(Build.SourceBranchName).tar.gz'
 
 - task: GitHubRelease@0
   inputs:
